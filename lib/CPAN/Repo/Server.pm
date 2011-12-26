@@ -38,12 +38,12 @@ get qr{/(\S+)/packages\.txt} => sub { # repo packages.txt
 	$ret.="# $p repository\n";
 	if(open F, "$REPO_ROOT/$p/packages.txt"){
 	 while (my $l = <F>){
-	  print "~$p/$l";
+	  $ret.="~$p/$l";
 	 }
 	}
 	$ret.="\n";
     }
-    return $ret.signature();
+    return $ret;
 };
 
 get qr{^/repo/(\w+)/$} => sub { # repo index page

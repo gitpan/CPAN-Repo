@@ -34,7 +34,7 @@
    "provides" : {
       "CPAN::Repo" : {
          "file" : "lib/CPAN/Repo.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       },
       "CPAN::Repo::Server" : {
          "file" : "lib/CPAN/Repo/Server.pm",
@@ -47,5 +47,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.0.3"
+   "version" : "v0.0.4"
 }

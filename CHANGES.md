@@ -3,3 +3,6 @@
 
 # 0.0.3
 - fix some errors in pod doc
+
+# 0.0.4
+- bug fix with packages.txt
