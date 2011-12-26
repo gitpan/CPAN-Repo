@@ -1,5 +1,5 @@
 package CPAN::Repo;
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 1;
 
 __END__
@@ -34,8 +34,8 @@ CPAN server for private cpan modules.
  4. now all the modules are available to install via cpan plus client!
  cpanp
  %cpanp /cs --add http://127.0.0.1/repo-one/
- %cpan x
- %cpan i Foo
+ %cpanp x
+ %cpanp i Foo
 
 
 =head1 Features
@@ -61,15 +61,16 @@ It's okay, just create as many as you wish, cpan repo server will care about fur
  
  
  2 re-setup cpanp client
- % cpanp
+ cpanp
  %cpanp /cs --remove http://127.0.0.1/repo/
  %cpanp /cs --add http://127.0.0.1/repo-one/repo-two/repo-three/
  %cpanp x
  
  3 all three repos are available via cpan server!
- % cpan i Foo
- % cpan i Baz
- % cpan i Bazz
+ 
+ cpanp -i Foo
+ cpanp -i Baz
+ cpanp -i Bazz
 
 =head1 Index merge 
 

@@ -1,4 +1,5 @@
 Build.PL
+CHANGES.md
 features/index.feature
 features/support/env.rb
 lib/CPAN/Repo.pm
