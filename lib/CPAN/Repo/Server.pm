@@ -39,7 +39,7 @@ get qr{/(\S+)/packages\.txt} => sub { # repo packages.txt
 	if(open F, "$REPO_ROOT/$p/packages.txt"){
 	 while (my $l = <F>){
 	  $ret.="~$p/$l";
-	 }
+	 }; close F;
 	}
 	$ret.="\n";
     }

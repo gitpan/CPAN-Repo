@@ -1,5 +1,5 @@
 package CPAN::Repo;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 1;
 
 __END__
@@ -15,33 +15,35 @@ CPAN server for private cpan modules.
 
 =head1 Usage
 
- Well, it's very simple!
- -----------------------
+Well, it's very simple!
  
  1. make repository
- mkdir repo-root/repo-one
+ mkdir -p repo-root/repo-one/
  
  2. copy distributives 
- cp Foo-v0.0.1.tar.gz Bar-v0.0.2 repo-one
+ cp Foo-v0.0.1.tar.gz Bar-v0.0.2 repo-root/repo-one/
  
  3. create cpan index 
- echo Foo-v0.0.1.tar.gz > repo-root/packages.txt
- echo Bar-v0.0.2 repo-one >> repo-root/packages.txt
+ echo Foo-v0.0.1.tar.gz > repo-root/repo-one/packages.txt
+ echo Bar-v0.0.2 repo-one >> repo-root/repo-one/packages.txt
   
  3. start cpan repo server
  cpan_repo repo-root/
  
  4. now all the modules are available to install via cpan plus client!
  cpanp
- %cpanp /cs --add http://127.0.0.1/repo-one/
+ %cpanp /cs --add http://<cpan-repo-server>/repo-one/
  %cpanp x
  %cpanp i Foo
 
+ * <cpan-repo-server> - IP of CPAN::Repo server, if you run cpanp client on the same host where
+ CPAN::Repo server run it could be 127.0.0.1
+ 
 
 =head1 Features
 
  - simple maintenance - thanks to the author of CPANPLUS, custom sources idea is cool! for details see
- `CUSTOM MODULE SOURCES' section in http://search.cpan.org/perldoc?CPANPLUS::Backend
+ 'CUSTOM MODULE SOURCES' section in http://search.cpan.org/perldoc?CPANPLUS::Backend
  - multiply cpan repos accessible via one cpan server, see datails below
  - index merge, see datails below
  - no need to care about global cpan mirrors synchronization as with CPAN::Mini, because in cpanplus
@@ -54,16 +56,20 @@ As with example above only one repository with private cpan modules was addes. W
 It's okay, just create as many as you wish, cpan repo server will care about further details:
 
  1 making repositories and copy distribuitves
- mkdir repo-root/repo-two
- mkdir repo-root/repo-three
- cp Baz-v0.0.1 repo-one repo-root/repo-two/
- cp Bazz-v0.0.1 repo-one repo-root/repo-three/
+ mkdir -p repo-root/repo-two/
+ mkdir -p repo-root/repo-three/
+ cp Baz-v0.0.1 repo-root/repo-two/
+ cp Bazz-v0.0.1 repo-root/repo-three/
+
+ # generate index 
+ echo Baz-v0.0.1.tar.gz > repo-root/repo-two/packages.txt
+ echo Bazz-v0.0.1 > repo-root/repo-three/packages.txt
  
  
  2 re-setup cpanp client
  cpanp
- %cpanp /cs --remove http://127.0.0.1/repo/
- %cpanp /cs --add http://127.0.0.1/repo-one/repo-two/repo-three/
+ %cpanp /cs --remove http://<cpan-repo-server>/repo/
+ %cpanp /cs --add http://<cpan-repo-server>/repo-one/repo-two/repo-three/
  %cpanp x
  
  3 all three repos are available via cpan server!
@@ -72,24 +78,49 @@ It's okay, just create as many as you wish, cpan repo server will care about fur
  cpanp -i Baz
  cpanp -i Bazz
 
+The common approach with multiple repositories is to setup custom sources as:
+
+ http://<cpan-repo-server>/repo/repo2/repo-<i>/../
+
+where I<repo, repo2, repo-<i>, ...> are names of repositories.
+
+
 =head1 Index merge 
 
-Here it's time to say about one great feature of CPAN::Repo called 'index merge', it simply means
-that repos which added to cpan server are merged B<in order>. Let's say we have Module called Foo of version
-v0.0.2 in repo `repo-one' and module with the same name but of version 0.0.1 in another repo `repo-two', 
-what happen if one add both repositories to cpan server, first `repo-one' and second `repo-two'? 
-The module from `last added' repo will win, and we'll get final version 0.0.1 of module Foo, this
-is handled by cpan server and called index merge.
+It's time to say about one great feature of CPAN::Repo called 'index merge'. 
+Let's say we have module called 'Foo' of the version 'v0.0.2' in repository named 'repo-one' and module 
+with the same name of the version 'v0.0.1' in another repository called 'repo-two', what happen 
+if one add both repositories to cpan server as with following custom source url:
 
-Here is great possibility for users:
+ http://<cpan-repo-server>/repo-one/repo-two
+
+As it's seen from the url 'repo-one' is added first and 'repo-two' is added last.
+'Index merge' means that repositorie's B<indexes> added to cpan server are B<merged in order>.
+
+The modules from repository which added last will win and override versions of their "predecessors" . 
+In the example above, one will get final version v0.0.1 of module Foo, all this logic is handled by cpan server 
+and called 'index merge'.
+
+
+'Index merge' is great possibility for:
 
  * Delevloper's "sandbox" cpan repos which may be merged with "trunk" cpan repository during development cycle.
- * Repos for patched modules coming from official cpan mirrors.
- * Repos with "frozen" versions of modules, allow to tag versions of your cpan modules and avoid installing 
+ * Repositories for patched modules coming from official cpan mirrors.
+ * Repositoris with "frozen" versions of modules, allow to tag versions of your cpan modules and avoid installing 
  last version of module when it's inadmissible.
  
  The main idea here is an isolation of your private cpan modules and capability to merge arbitrary cpan repositories
  during deploment process.
+
+
+=head1 Limitations 
+
+ - repositories names should follow pattern /a-zA-Z_-/
+ - nested repositories are not supported, it means repo_root/foo/bar/ as repository place won't work, the same
+ for distributives - they should be placed in the repository directory as plain list without subdirectroies
+ - packages.txt - are custom source indexes should be kept actual and mantained by someone else, CPAN::Repo only
+ provide read access for repository distributives and indexes and does proper index merge.
+
 
 =head1 Author
 
